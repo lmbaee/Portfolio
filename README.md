@@ -2,9 +2,9 @@
 
 **My Portfolio** is web application that shows my creativity to users where I can also share projects that I have completed. Users are introduced to a game style start screen. In which were they are given different menu options and can mute and unmute ambience while being keyboard friendly for choice selection.The frontend is built with **Vite + React** for a fast and modern development experience.
 
-![Demo of My Portfolio](./frontend/public/assets/MyPortfolioDemo.gif)
+![Demo of My Portfolio](...)
 
- [Check out the Live Demo here →](...)
+ [Check out the Live Demo here →](https://jason-c-portfolio.vercel.app)
 
 ## Features
 
