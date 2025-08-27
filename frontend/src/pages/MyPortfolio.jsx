@@ -10,8 +10,8 @@ import SceneItSearch from "/assets/Scene It Search.png";
 
 import SimpsonsThumb from "/assets/SimpsonsApi.png";
 
-import CySA from "/assets/CompTIA CySA+ certificate.jpg";
-import SecurityPlus from "/assets/CompTIA Security+ certificate.jpg";
+import CySA from "/assets/CompTIA CySA+ certificate.png";
+import SecurityPlus from "/assets/CompTIA Security+ certificate.png";
 import CSAP from "/assets/comptia-security-analytics-professional-csap-stackable-certification.png";
 import Splunk from "/assets/Splunk Certification.jpg";
 import LinuxEss from "/assets/Linux_Essentials_Certificate.jpg";
