@@ -4,7 +4,7 @@
 
 ![Demo of My Portfolio](./frontend/public/assets/MyPortfolioDemo.gif)
 
- [Check out the Live Demo here →](https://jason-c-portfolio.vercel.app)
+ [Check out the Live Demo here →](https://www.jasoncardenas.net)
 
 ## Features
 
