@@ -6,12 +6,26 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Nosifer&family=Creepster&display=swap");
 
 :root {
-  --accent: #b31b1b;
+  --accent:  #b31b1b;
 }
 
 /* Global cinematic base */
 html, body, #root {
   height: 100%;
+}
+
+/* Use crowbar cursor globally */
+body {
+  cursor: url('/assets/crowbar.png'), auto;
+}
+
+/* Inputs, buttons, textareas and selects should use default cursor for usability */
+input,
+button,
+textarea,
+select,
+[role="button"] {
+  cursor: default;
 }
 
 /* Grain + vignette overlay helpers */
@@ -48,8 +62,8 @@ html, body, #root {
 }
 .btn-ghost:hover,
 .btn-ghost:focus-visible {
-  color: white;
-  text-shadow: 0 0 8px rgba(179,27,27,0.9);
+  color:  white
+  text-shadow 0 0 8px rgba(179,27,27,0.9);
 }
 .btn-ghost:active::after {
   /* dripping accent on click */
@@ -81,12 +95,12 @@ html, body, #root {
   clip-path: inset(0 0 0 0);
 }
 .glitch::before {
-  color: #00ffc8;
+  color:  #00ffc8;
   transform: translate(1px, 0);
   mix-blend-mode: screen;
 }
 .glitch::after {
-  color: #ff0048;
+  color:  #ff0048;
   transform: translate(-1px, 0);
   mix-blend-mode: screen;
 }

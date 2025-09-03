@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState({ name: "", email: "", message: "", honey: "" });
+  const navigate = useNavigate();
+  const redirectTimerRef = useRef(null);
 
   const validate = () => {
     const e = {};
@@ -19,8 +22,38 @@ export default function ContactPage() {
   const submit = (ev) => {
     ev.preventDefault();
     if (validate()) {
+      // show success overlay
       setTimeout(() => setSent(true), 200);
     }
+  };
+
+  // When sent becomes true, set a 3s redirect timer. Clean up timers on unmount or when closed.
+  useEffect(() => {
+    if (sent) {
+      // clear any existing
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+      redirectTimerRef.current = setTimeout(() => {
+        navigate("/portfolio");
+      }, 3000);
+    }
+    return () => {
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+        redirectTimerRef.current = null;
+      }
+    };
+  }, [sent, navigate]);
+
+  const handleClose = () => {
+    // Immediately redirect to /portfolio
+    if (redirectTimerRef.current) {
+      clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = null;
+    }
+    setSent(false);
+    navigate("/portfolio");
   };
 
   return (
@@ -108,7 +141,9 @@ export default function ContactPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setSent(false)}
+            onClick={() => {
+              // clicking overlay should not cancel the modal redirect; keep modal open
+            }}
           >
             <motion.div
               className="rounded-3xl bg-neutral-950 p-8 text-center shadow-2xl ring-1 ring-white/10"
@@ -122,7 +157,7 @@ export default function ContactPage() {
               </p>
               <button
                 className="mt-6 rounded bg-blood px-4 py-2 text-white"
-                onClick={() => setSent(false)}
+                onClick={handleClose}
               >
                 Close
               </button>

@@ -1,7 +1,27 @@
-import { Link, NavLink } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function Nav() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleScrollOrNav = (id) => {
+    const scrollToId = () => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+
+    if (location.pathname === "/portfolio") {
+      scrollToId();
+    } else {
+      navigate("/portfolio");
+      // use window.onload fallback if needed
+      setTimeout(scrollToId, 500);
+    }
+  };
+
   return (
     <nav
       className="fixed inset-x-0 top-0 z-40 flex items-center justify-between
@@ -9,42 +29,43 @@ export default function Nav() {
                  border-b border-white/10 shadow-[0_2px_12px_rgba(0,0,0,0.35)]"
       aria-label="Primary"
     >
-      <Link
-        to="/portfolio"
+      <button
+        onClick={() => navigate("/portfolio")}
         className="font-display text-xl text-neutral-100 hover:text-white"
       >
-        <span className="text-blood">🩸</span> Jason Cardenas 
-      </Link>
+        <span className="text-blood">🩸</span> Jason Cardenas
+      </button>
 
       <ul className="flex items-center gap-6">
         <li>
-          <NavLink
-            to="/portfolio"
-            className={({ isActive }) =>
-              "text-sm uppercase tracking-widest transition " +
-              (isActive ? "text-white" : "text-neutral-200 hover:text-white")
-            }
+          <button
+            onClick={() => handleScrollOrNav("experience")}
+            className="text-sm uppercase tracking-widest transition text-neutral-200 hover:text-white"
           >
-            Portfolio
-          </NavLink>
+            Work Experience
+          </button>
         </li>
         <li>
-          <NavLink
-            to="/contact"
-            className={({ isActive }) =>
-              "text-sm uppercase tracking-widest transition " +
-              (isActive ? "text-white" : "text-neutral-200 hover:text-white")
-            }
+          <button
+            onClick={() => handleScrollOrNav("work")}
+            className="text-sm uppercase tracking-widest transition text-neutral-200 hover:text-white"
           >
-            Contact
-          </NavLink>
+            Projects
+          </button>
+        </li>
+        <li>
+          <button
+            onClick={() => handleScrollOrNav("gallery")}
+            className="text-sm uppercase tracking-widest transition text-neutral-200 hover:text-white"
+          >
+            Gallery
+          </button>
         </li>
         <li>
           <motion.button
             whileTap={{ scale: 0.96 }}
-            className="rounded-full bg-blood px-3 py-1 text-sm font-semibold
-                       text-white shadow-inner shadow-black/40 hover:bg-blood/90"
-            onClick={() => (window.location.href = "/")}
+            className="rounded-full bg-blood px-3 py-1 text-sm font-semibold text-white shadow-inner shadow-black/40 hover:bg-blood/90"
+            onClick={() => navigate("/")}
             aria-label="Back to Start"
             title="Back to Start"
           >
