@@ -2,12 +2,14 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Hero image
-import HeroImg from "/assets/GhostFace.jpg";
+import Hero3D from "../components/Hero3D.jsx";
+import BioSection from "../components/BioSection.jsx";
+import WorkExperience from "../components/WorkExperience.jsx";
+import Gallery from "../components/Gallery.jsx";
 
-// Project thumbs & images
+// Project thumbs & images & Ambience audio
 import SceneItThumb from "/assets/SceneIT.png";
 import SceneItSearch from "/assets/Scene It Search.png";
-
 import SimpsonsThumb from "/assets/SimpsonsApi.png";
 
 import CySA from "/assets/CySA+.png";
@@ -17,8 +19,7 @@ import Splunk from "/assets/Splunk Certification.jpg";
 import LinuxEss from "/assets/Linux_Essentials_Certificate.jpg";
 import NetEss from "/assets/Networking_Essentials_Certificate.jpg";
 
-// Ambience audio
-import GhostfaceAmbience from "/assets/GhostfaceAmbience.mp3";
+import JasonToddAudio from "/assets/JasonToddAudio.mp3";
 
 const projects = [
   {
@@ -145,7 +146,7 @@ export default function MyPortfolio() {
     const stored = localStorage.getItem("ambienceOn");
     if (stored === "true") {
       setAudioOn(true);
-      audioRef.current?.play().catch(() => {}); // ignore autoplay restrictions
+      audioRef.current?.play().catch(() => {});
     }
   }, []);
 
@@ -164,46 +165,20 @@ export default function MyPortfolio() {
 
   return (
     <div className="relative bg-black text-neutral-200">
-      {/* Hero */}
-      <header
-        className="relative grid min-h-[50vh] sm:min-h-[70vh] lg:min-h-[85vh] place-items-center overflow-hidden"
-        aria-label="Hero"
-      >
-        <picture>
-          <source
-            srcSet={`${HeroImg} 640w, ${HeroImg} 1280w, ${HeroImg} 1920w`}
-            sizes="(max-width: 768px) 100vw, (min-width: 1280px) 100vw, 100vw"
-          />
-          <img
-            src={HeroImg}
-            alt="Foggy forest with eerie cabin — portfolio hero"
-            className="absolute inset-0 h-full w-full object-cover opacity-70"
-            loading="eager"
-            decoding="async"
-            fetchpriority="high"
-          />
-        </picture>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black" />
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center lg:text-left">
-          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl text-white drop-shadow-lg">
-            Hello, I’m <span className="text-blood">Jason Cardenas</span>
-          </h1>
-          <p className="mx-auto lg:mx-0 mt-4 max-w-2xl text-base sm:text-lg text-neutral-300">
-            I am a Web Developer with a passion for Horror interfaces and
-            Cybersecurity.
-          </p>
-          <a
-            href="#work"
-            className="mt-8 inline-block w-full sm:w-auto rounded bg-blood px-4 py-3 min-h-[44px] font-semibold uppercase tracking-wider text-white shadow hover:bg-blood/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-blood"
-          >
-            View Projects
-          </a>
-        </div>
+      {/* Hero (3D Red Hood model) */}
+      <header>
+        <Hero3D />
       </header>
 
-      {/* Projects grid */}
+      {/* Bio Section */}
+      <BioSection />
+
+      {/* Work Experience */}
+      <WorkExperience />
+
+      {/* Projects Grid */}
       <main id="work" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <h2 className="mb-6 font-display text-2xl sm:text-3xl">Selected Work</h2>
+        <h2 className="mb-6 font-display text-2xl sm:text-3xl">Projects</h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {projects.map((p) => (
             <motion.article
@@ -212,10 +187,6 @@ export default function MyPortfolio() {
               className="group relative overflow-hidden rounded-2xl bg-neutral-900 focus-within:ring-2 focus-within:ring-blood"
             >
               <picture>
-                <source
-                  srcSet={`${p.thumb} 640w, ${p.thumb} 1280w`}
-                  sizes="(max-width: 640px) 100vw, 33vw"
-                />
                 <img
                   src={p.thumb}
                   alt={`${p.title} preview`}
@@ -332,6 +303,21 @@ export default function MyPortfolio() {
         )}
       </AnimatePresence>
 
+      {/* Gallery */}
+      <Gallery />
+
+      {/* Resume */}
+      <section id="resume" className="mx-auto max-w-5xl px-6 py-16 text-center">
+        <h2 className="text-3xl font-display text-white mb-4">Resume</h2>
+        <a
+          href="/assets/resume.pdf"
+          download
+          className="inline-block rounded bg-blood px-6 py-3 text-white font-semibold hover:bg-blood/90"
+        >
+          Download Resume
+        </a>
+      </section>
+
       {/* Footer */}
       <footer className="mt-10 border-t border-white/10 px-6 py-10">
         <div className="mx-auto flex max-w-7xl flex-col sm:flex-row items-center justify-between gap-6">
@@ -341,7 +327,7 @@ export default function MyPortfolio() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Linkedin"
-              className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-blood"
+              className="hover:text-white"
             >
               LinkedIn
             </a>
@@ -350,15 +336,21 @@ export default function MyPortfolio() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"
-              className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-blood"
+              className="hover:text-white"
             >
               GitHub
+            </a>
+            <a
+              href="mailto:cardenasjason2003@gmail.com"
+              className="hover:text-white"
+            >
+              Email
             </a>
           </div>
 
           {/* Ambience toggle */}
           <div className="flex items-center">
-            <audio ref={audioRef} src={GhostfaceAmbience} loop />
+            <audio ref={audioRef} src={JasonToddAudio} loop />
             <button
               className="rounded bg-neutral-800 px-3 py-2 text-sm text-neutral-300 hover:bg-neutral-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blood min-h-[44px]"
               onClick={toggleAmbience}
