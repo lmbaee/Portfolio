@@ -184,7 +184,7 @@ export default function MyPortfolio() {
             <motion.article
               key={p.id}
               whileHover={{ y: -4 }}
-              className="group relative overflow-hidden rounded-2xl bg-neutral-900 focus-within:ring-2 focus-within:ring-blood"
+              className="group relative overflow-hidden rounded-2xl bg-neutral-900"
             >
               <picture>
                 <img
@@ -208,7 +208,7 @@ export default function MyPortfolio() {
                     : ""}
                 </p>
                 <button
-                  className="mt-4 inline-flex items-center gap-2 rounded bg-neutral-800 px-3 py-2 text-sm hover:bg-neutral-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blood min-h-[44px]"
+                  className="mt-4 inline-flex items-center gap-2 rounded bg-neutral-800 px-3 py-2 text-sm hover:bg-neutral-700"
                   onClick={() => setActive(p)}
                   aria-label={`Open case study: ${p.title}`}
                 >
@@ -240,19 +240,14 @@ export default function MyPortfolio() {
               initial={{ y: 40, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 20, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 200, damping: 22 }}
             >
               <header className="flex items-center justify-between border-b border-white/10 p-4">
                 <div>
-                  <h4 id="case-study-title" className="text-xl font-semibold">
-                    {active.title}
-                  </h4>
-                  <p className="text-xs uppercase tracking-widest text-neutral-400">
-                    {active.tag}
-                  </p>
+                  <h4 className="text-xl font-semibold">{active.title}</h4>
+                  <p className="text-xs uppercase tracking-widest text-neutral-400">{active.tag}</p>
                 </div>
                 <button
-                  className="rounded bg-neutral-800 px-3 py-2 hover:bg-neutral-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blood"
+                  className="rounded bg-neutral-800 px-3 py-2 hover:bg-neutral-700"
                   onClick={() => setActive(null)}
                   aria-label="Close modal"
                 >
@@ -286,15 +281,9 @@ export default function MyPortfolio() {
                     />
                   ))}
                 </div>
-                <div id="case-study-desc" className="mt-4 text-neutral-300 space-y-4">
+                <div className="mt-4 text-neutral-300 space-y-4">
                   {active.description.map((d, i) =>
-                    typeof d === "string" ? (
-                      <p key={i} className="leading-relaxed">
-                        {d}
-                      </p>
-                    ) : (
-                      React.cloneElement(d, { key: i })
-                    )
+                    typeof d === "string" ? <p key={i}>{d}</p> : d
                   )}
                 </div>
               </div>
@@ -322,30 +311,9 @@ export default function MyPortfolio() {
       <footer className="mt-10 border-t border-white/10 px-6 py-10">
         <div className="mx-auto flex max-w-7xl flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4 text-neutral-400">
-            <a
-              href="https://www.linkedin.com/in/jasonecardenas"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Linkedin"
-              className="hover:text-white"
-            >
-              LinkedIn
-            </a>
-            <a
-              href="https://github.com/lmbaee"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="GitHub"
-              className="hover:text-white"
-            >
-              GitHub
-            </a>
-            <a
-              href="mailto:cardenasjason2003@gmail.com"
-              className="hover:text-white"
-            >
-              Email
-            </a>
+            <a href="https://www.linkedin.com/in/jasonecardenas" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a href="https://github.com/lmbaee" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="mailto:cardenasjason2003@gmail.com">Email</a>
           </div>
 
           {/* Ambience toggle */}

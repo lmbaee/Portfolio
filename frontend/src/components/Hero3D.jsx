@@ -1,11 +1,19 @@
-import { Canvas, useLoader } from "@react-three/fiber";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { OrbitControls, Stage } from "@react-three/drei";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { motion } from "framer-motion";
 
 function RedHoodModel() {
   const gltf = useLoader(GLTFLoader, "/assets/redhood.glb");
+  const modelRef = useRef();
+
+  // continuous rotation using useFrame
+  useFrame((state, delta) => {
+    if (modelRef.current) {
+      modelRef.current.rotation.y += delta * 0.4;
+    }
+  });
 
   return (
     <primitive
