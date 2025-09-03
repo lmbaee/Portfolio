@@ -20,6 +20,17 @@ export default function GameScreen() {
   const [audioOn, setAudioOn] = useState(false);
   const videoRef = useRef(null);
 
+  // Load ambience state from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("ambienceOn");
+    if (stored === "true") {
+      setAudioOn(true);
+      if (videoRef.current) {
+        videoRef.current.muted = false;
+      }
+    }
+  }, []);
+
   useEffect(() => {
     const handle = (e) => {
       if (isTransitioning) return;
@@ -120,10 +131,11 @@ export default function GameScreen() {
               className="rounded bg-black/40 px-3 py-1 ring-1 ring-white/10 hover:ring-white/30"
               onClick={() => {
                 if (videoRef.current) {
-                  // toggle muted property
-                  videoRef.current.muted = audioOn; 
+                  videoRef.current.muted = audioOn;
                 }
-                setAudioOn((s) => !s);
+                const newState = !audioOn;
+                setAudioOn(newState);
+                localStorage.setItem("ambienceOn", newState ? "true" : "false");
               }}
             >
               {audioOn ? "Mute ambience" : "Enable ambience"}
