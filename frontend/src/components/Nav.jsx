@@ -30,10 +30,10 @@ export default function Nav() {
       aria-label="Primary"
     >
       <button
-        onClick={() => navigate("/portfolio")}
-        className="font-display text-xl text-neutral-100 hover:text-white"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        className="text-sm uppercase tracking-widest transition text-neutral-200 hover:text-white"
       >
-        <span className="text-blood">🩸</span> Jason Cardenas
+        🩸 Jason Cardenas
       </button>
 
       <ul className="flex items-center gap-6">
@@ -59,6 +59,14 @@ export default function Nav() {
             className="text-sm uppercase tracking-widest transition text-neutral-200 hover:text-white"
           >
             Gallery
+          </button>
+        </li>
+        <li>
+          <button
+            onClick={() => navigate("/contact")}
+            className="text-sm uppercase tracking-widest transition text-neutral-200 hover:text-white"
+          >
+            Contact
           </button>
         </li>
         <li>
