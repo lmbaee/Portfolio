@@ -164,7 +164,7 @@ export default function MyPortfolio() {
   };
 
   return (
-    <div className="relative bg-black text-neutral-200">
+    <div className="relative bg-transparent text-neutral-200">
       {/* Hero (3D Red Hood model) */}
       <header>
         <Hero3D />
@@ -224,7 +224,7 @@ export default function MyPortfolio() {
       <AnimatePresence>
         {active && (
           <motion.div
-            className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-2 sm:p-4"
+            className="fixed inset-0 z-50 grid place-items-center bg-transparent/70 p-2 sm:p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

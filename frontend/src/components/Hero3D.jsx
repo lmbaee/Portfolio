@@ -38,7 +38,7 @@ export default function Hero3D() {
   }, []);
 
   return (
-    <section className="h-[70vh] w-full bg-black flex items-center justify-center">
+    <section className="h-[70vh] w-full bg-transparent flex items-center justify-center">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
