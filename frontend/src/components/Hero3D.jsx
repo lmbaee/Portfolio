@@ -38,14 +38,26 @@ export default function Hero3D() {
   }, []);
 
   return (
-    <section className="h-[70vh] w-full bg-transparent flex items-center justify-center">
+    <section
+      className={`w-full bg-transparent flex items-center justify-center ${
+        isMobile ? "h-[40vh]" : "h-[70vh]"
+      }`}
+    >
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
         className="w-full h-full"
       >
-        <Canvas camera={{ position: [0, 1.6, 5], fov: 50 }}>
+        <Canvas
+          camera={{ position: [0, 1.6, 5], fov: 50 }}
+          dpr={[1, 1.5]}
+          onCreated={({ gl }) => {
+            // allow scroll gestures to pass through
+            gl.domElement.style.touchAction = "pan-y";
+          }}
+          style={{ touchAction: "pan-y" }}
+        >
           <ambientLight intensity={0.6} />
           <Suspense fallback={null}>
             <Stage environment="city" intensity={0.6}>

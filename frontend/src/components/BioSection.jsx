@@ -4,11 +4,6 @@ export default function BioSection() {
       id="bio"
       className="mx-auto max-w-5xl px-6 py-16 grid md:grid-cols-2 gap-10 items-center"
     >
-      <img
-        src="/assets/headshot-placeholder.jpg"
-        alt="Headshot"
-        className="w-48 h-48 object-cover rounded-full mx-auto md:mx-0"
-      />
       <div>
         <h2 className="text-3xl font-display text-white">About Me</h2>
         <p className="mt-4 text-neutral-300 leading-relaxed">
