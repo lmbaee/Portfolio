@@ -146,19 +146,34 @@ export default function MyPortfolio() {
     const stored = localStorage.getItem("ambienceOn");
     if (stored === "true") {
       setAudioOn(true);
-      audioRef.current?.play().catch(() => {});
+      if (audioRef.current) {
+        // Unmute before trying to play; if autoplay is blocked the promise will reject and is safely caught.
+        audioRef.current.muted = false;
+        audioRef.current.play().catch((err) => {
+          console.debug("Autoplay prevented:", err);
+        });
+      }
     }
   }, []);
 
   const toggleAmbience = () => {
     if (audioRef.current) {
       if (audioOn) {
+        // Disabling: pause and mute to ensure no audio after toggling and persist state.
         audioRef.current.pause();
+        audioRef.current.muted = true;
         localStorage.setItem("ambienceOn", "false");
       } else {
-        audioRef.current.play().catch(() => {});
+        // Enabling: unmute and try to play; catch errors if user gesture required.
+        audioRef.current.muted = false;
+        audioRef.current.play().catch((err) => {
+          console.debug("Play blocked:", err);
+        });
         localStorage.setItem("ambienceOn", "true");
       }
+    } else {
+      // If ref not ready, still persist the chosen state.
+      localStorage.setItem("ambienceOn", audioOn ? "false" : "true");
     }
     setAudioOn((s) => !s);
   };
@@ -318,7 +333,11 @@ export default function MyPortfolio() {
 
           {/* Ambience toggle */}
           <div className="flex items-center">
-            <audio ref={audioRef} src={JasonToddAudio} loop />
+            {/*
+              Start muted by default (muted attribute). When user enables ambience (or stored state is true),
+              we unmute and try to play. This helps desktop autoplay succeed while gracefully handling mobile/user-gesture policies.
+            */}
+            <audio ref={audioRef} src={JasonToddAudio} loop muted />
             <button
               className="rounded bg-neutral-800 px-3 py-2 text-sm text-neutral-300 hover:bg-neutral-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blood min-h-[44px]"
               onClick={toggleAmbience}

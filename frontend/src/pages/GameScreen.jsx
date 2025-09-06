@@ -20,13 +20,18 @@ export default function GameScreen() {
   const [audioOn, setAudioOn] = useState(false);
   const videoRef = useRef(null);
 
-  // Load ambience state from localStorage
+  // Load ambience state from localStorage and try to resume playback
   useEffect(() => {
     const stored = localStorage.getItem("ambienceOn");
     if (stored === "true") {
       setAudioOn(true);
       if (videoRef.current) {
+        // Unmute and attempt to play. If autoplay is blocked (mobile / browsers requiring gesture), catch the rejection.
         videoRef.current.muted = false;
+        videoRef.current.play().catch((err) => {
+          // Safe console handling; keep toggle state in UI consistent with stored value.
+          console.debug("Video autoplay prevented:", err);
+        });
       }
     }
   }, []);
@@ -131,7 +136,14 @@ export default function GameScreen() {
               className="rounded bg-black/40 px-3 py-1 ring-1 ring-white/10 hover:ring-white/30"
               onClick={() => {
                 if (videoRef.current) {
+                  // Toggle muted state: if audioOn is true (currently audible), set muted to true to mute.
                   videoRef.current.muted = audioOn;
+                  if (!audioOn) {
+                    // we're enabling ambience: try to play and unmute
+                    videoRef.current.play().catch((err) => {
+                      console.debug("Play blocked:", err);
+                    });
+                  }
                 }
                 const newState = !audioOn;
                 setAudioOn(newState);
