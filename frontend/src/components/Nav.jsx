@@ -46,6 +46,7 @@ export default function Nav() {
     >
       <button
         onClick={() => {
+          navigate("/portfolio");
           window.scrollTo({ top: 0, behavior: "smooth" });
           setOpen(false);
         }}
