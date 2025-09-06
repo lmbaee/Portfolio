@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import * as THREE from "three";
@@ -43,24 +43,30 @@ function SceneContent({ animate }) {
   useFrame((_, delta) => {
     if (!animate) return;
 
-    const denom = Math.max(1, document.body.scrollHeight - window.innerHeight);
-    const progress = Math.min(1, Math.max(0, window.scrollY / denom));
+    // For desktop, we use scroll-based animation
+    if (window.innerWidth >= 768) {
+      const denom = Math.max(1, document.body.scrollHeight - window.innerHeight);
+      const progress = Math.min(1, Math.max(0, window.scrollY / denom));
 
-    // Map scroll to yaw angle (right-left pan)
-    scrollTarget.current = -progress * Math.PI * 2;
+      // Map scroll to yaw angle (right-left pan)
+      scrollTarget.current = -progress * Math.PI * 2;
 
-    const smoothing = 5;
-    scrollCurrent.current +=
-      (scrollTarget.current - scrollCurrent.current) *
-      Math.min(1, delta * smoothing);
+      const smoothing = 5;
+      scrollCurrent.current +=
+        (scrollTarget.current - scrollCurrent.current) *
+        Math.min(1, delta * smoothing);
 
-    // Instead of orbiting, lock position and rotate yaw
-    camera.position.lerp(startPos.current, 0.1);
-    camera.rotation.set(0, scrollCurrent.current, 0);
+      // Instead of orbiting, lock position and rotate yaw
+      camera.position.lerp(startPos.current, 0.1);
+      camera.rotation.set(0, scrollCurrent.current, 0);
 
-    if (camera.fov !== startFov.current) {
-      camera.fov = startFov.current;
-      camera.updateProjectionMatrix();
+      if (camera.fov !== startFov.current) {
+        camera.fov = startFov.current;
+        camera.updateProjectionMatrix();
+      }
+    } else {
+      // For mobile, ensure automatic rotation of the scene
+      camera.rotation.y += delta * 0.2; // Smooth automatic rotation
     }
   });
 
@@ -94,7 +100,12 @@ export default function SceneBackground() {
     <div className="pointer-events-none fixed inset-0 z-[-1]" aria-hidden>
       <Canvas
         camera={{ position: [0, 2, 5], fov: 50 }}
-        style={{ position: "fixed", inset: 0 }}
+        style={{
+          position: "fixed",
+          inset: 0,
+          width: "100vw",  // Ensure full width on mobile
+          height: "100vh", // Ensure full height on mobile
+        }}
       >
         <color attach="background" args={["#111111"]} />
         <Suspense fallback={null}>
