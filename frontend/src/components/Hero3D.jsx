@@ -54,7 +54,7 @@ export default function Hero3D() {
           </Suspense>
           <OrbitControls
             enableZoom={false}
-            autoRotate={!isMobile}
+            autoRotate={true}
             autoRotateSpeed={1}
             enablePan={false}
             minPolarAngle={Math.PI / 2.5} // restrict downward tilt
