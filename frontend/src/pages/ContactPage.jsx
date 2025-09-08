@@ -6,6 +6,7 @@ export default function ContactPage() {
   const [sent, setSent] = useState(false);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState({ name: "", email: "", message: "", honey: "" });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const redirectTimerRef = useRef(null);
 
@@ -19,11 +20,42 @@ export default function ContactPage() {
     return Object.keys(e).length === 0;
   };
 
-  const submit = (ev) => {
+  const submit = async (ev) => {
     ev.preventDefault();
-    if (validate()) {
-      // show success overlay
-      setTimeout(() => setSent(true), 200);
+    setErrors({});
+    if (!validate()) return;
+
+    setLoading(true);
+
+    try {
+      // Supabase Edge Function
+      const endpoint = import.meta.env.VITE_CONTACT_FN_URL || "/api/contact";
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          message: form.message,
+          honey: form.honey,
+        }),
+      });
+
+      if (!res.ok) {
+        // try to parse JSON error if present
+        let err = { message: res.statusText || "Failed to send" };
+        try { err = await res.json(); } catch (e) {}
+        setErrors({ submit: err.error || err.message || "Failed to send message." });
+      } else {
+        setSent(true);
+        // clear the form (minor UX improvement)
+        setForm({ name: "", email: "", message: "", honey: "" });
+      }
+    } catch (err) {
+      setErrors({ submit: err.message || "Network error" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -120,11 +152,14 @@ export default function ContactPage() {
           {errors.message && <p className="mt-1 text-sm text-blood">{errors.message}</p>}
         </div>
 
+        {errors.submit && <p className="mb-4 text-sm text-blood">{errors.submit}</p>}
+
         <button
           type="submit"
-          className="group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-blood px-6 py-3 font-semibold text-white"
+          disabled={loading}
+          className={`group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-blood px-6 py-3 font-semibold text-white ${loading ? "opacity-70 cursor-wait" : ""}`}
         >
-          <span className="relative z-10">Send</span>
+          <span className="relative z-10">{loading ? "Sending…" : "Send"}</span>
           {/* blood smear */}
           <span
             aria-hidden
