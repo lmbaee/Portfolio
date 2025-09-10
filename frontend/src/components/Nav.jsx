@@ -67,7 +67,7 @@ export default function Nav() {
         </li>
         <li>
           <button
-            onClick={() => handleScrollOrNav("work")}
+            onClick={() => handleScrollOrNav("projects")}
             className="text-sm uppercase tracking-widest transition text-neutral-200 hover:text-white"
           >
             Projects

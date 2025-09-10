@@ -144,7 +144,7 @@ export default function Projects() {
     <>
       {/* Projects Grid */}
       <main
-        id="work"
+        id="projects"
         className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16"
       >
         <h2 className="mb-6 font-display text-2xl sm:text-3xl">Projects</h2>

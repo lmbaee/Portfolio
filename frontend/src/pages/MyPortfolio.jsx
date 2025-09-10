@@ -59,7 +59,7 @@ export default function MyPortfolio() {
       <section id="resume" className="mx-auto max-w-5xl px-6 py-16 text-center">
         <h2 className="text-3xl font-display text-white mb-4">Resume</h2>
         <a
-          href="/assets/resume.pdf"
+          href="/assets/IT_Support_Specialist-Jason Cardenas.pdf"
           download
           className="inline-block rounded bg-blood px-6 py-3 text-white font-semibold hover:bg-blood/90"
         >
