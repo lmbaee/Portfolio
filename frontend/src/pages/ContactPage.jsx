@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState({ name: "", email: "", message: "", honey: "" });
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const redirectTimerRef = useRef(null);
 
   const validate = () => {
     const e = {};
@@ -16,11 +20,74 @@ export default function ContactPage() {
     return Object.keys(e).length === 0;
   };
 
-  const submit = (ev) => {
+  const submit = async (ev) => {
     ev.preventDefault();
-    if (validate()) {
-      setTimeout(() => setSent(true), 200);
+    setErrors({});
+    if (!validate()) return;
+
+    setLoading(true);
+
+    try {
+      // Supabase Edge Function
+      const endpoint = import.meta.env.VITE_CONTACT_FN_URL || "/api/contact";
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+         },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          message: form.message,
+          honey: form.honey,
+        }),
+      });
+
+      if (!res.ok) {
+        // try to parse JSON error if present
+        let err = { message: res.statusText || "Failed to send" };
+        try { err = await res.json(); } catch (e) {}
+        setErrors({ submit: err.error || err.message || "Failed to send message." });
+      } else {
+        setSent(true);
+        // clear the form (minor UX improvement)
+        setForm({ name: "", email: "", message: "", honey: "" });
+      }
+    } catch (err) {
+      setErrors({ submit: err.message || "Network error" });
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // When sent becomes true, set a 3s redirect timer. Clean up timers on unmount or when closed.
+  useEffect(() => {
+    if (sent) {
+      // clear any existing
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+      redirectTimerRef.current = setTimeout(() => {
+        navigate("/portfolio");
+      }, 3000);
+    }
+    return () => {
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+        redirectTimerRef.current = null;
+      }
+    };
+  }, [sent, navigate]);
+
+  const handleClose = () => {
+    // Immediately redirect to /portfolio
+    if (redirectTimerRef.current) {
+      clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = null;
+    }
+    setSent(false);
+    navigate("/portfolio");
   };
 
   return (
@@ -87,11 +154,14 @@ export default function ContactPage() {
           {errors.message && <p className="mt-1 text-sm text-blood">{errors.message}</p>}
         </div>
 
+        {errors.submit && <p className="mb-4 text-sm text-blood">{errors.submit}</p>}
+
         <button
           type="submit"
-          className="group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-blood px-6 py-3 font-semibold text-white"
+          disabled={loading}
+          className={`group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-blood px-6 py-3 font-semibold text-white ${loading ? "opacity-70 cursor-wait" : ""}`}
         >
-          <span className="relative z-10">Send</span>
+          <span className="relative z-10">{loading ? "Sending…" : "Send"}</span>
           {/* blood smear */}
           <span
             aria-hidden
@@ -108,7 +178,9 @@ export default function ContactPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setSent(false)}
+            onClick={() => {
+              // clicking overlay should not cancel the modal redirect; keep modal open
+            }}
           >
             <motion.div
               className="rounded-3xl bg-neutral-950 p-8 text-center shadow-2xl ring-1 ring-white/10"
@@ -122,7 +194,7 @@ export default function ContactPage() {
               </p>
               <button
                 className="mt-6 rounded bg-blood px-4 py-2 text-white"
-                onClick={() => setSent(false)}
+                onClick={handleClose}
               >
                 Close
               </button>
