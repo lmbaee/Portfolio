@@ -2,13 +2,78 @@ import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
+// Simple sanitization utilities
+const stripTags = (str) => str.replace(/<\/?[^>]+(>|$)/g, "");
+const removeScripts = (str) =>
+  str.replace(/javascript:/gi, "").replace(/data:/gi, "").replace(/vbscript:/gi, "");
+const removeUrls = (str) => str.replace(/https?:\/\/[^\s]+/gi, "");
+const sanitizeInput = (str, { allowUrls = false } = {}) => {
+  let clean = str;
+  clean = stripTags(clean);
+  clean = removeScripts(clean);
+  if (!allowUrls) {
+    clean = removeUrls(clean);
+  }
+  return clean.trim();
+};
+
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState({ name: "", email: "", message: "", honey: "" });
   const [loading, setLoading] = useState(false);
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
   const navigate = useNavigate();
   const redirectTimerRef = useRef(null);
+
+  const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
+
+  // Load reCAPTCHA v3 script
+  useEffect(() => {
+    if (!RECAPTCHA_SITE_KEY) return;
+
+    if (document.querySelector(`script[data-recaptcha="v3"]`)) {
+      waitForGrecaptcha().then(() => setRecaptchaReady(true)).catch(() => setRecaptchaReady(false));
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
+    script.async = true;
+    script.defer = true;
+    script.setAttribute("data-recaptcha", "v3");
+    script.onload = () => {
+      waitForGrecaptcha().then(() => setRecaptchaReady(true)).catch(() => setRecaptchaReady(false));
+    };
+    script.onerror = () => setRecaptchaReady(false);
+    document.head.appendChild(script);
+  }, [RECAPTCHA_SITE_KEY]);
+
+  const waitForGrecaptcha = (timeout = 5000) =>
+    new Promise((resolve, reject) => {
+      const start = Date.now();
+      const check = () => {
+        if (window.grecaptcha && typeof window.grecaptcha.execute === "function") {
+          resolve();
+        } else if (Date.now() - start > timeout) {
+          reject(new Error("grecaptcha not available"));
+        } else {
+          setTimeout(check, 150);
+        }
+      };
+      check();
+    });
+
+  const executeRecaptcha = async (action = "contact") => {
+    if (!RECAPTCHA_SITE_KEY) return null;
+    try {
+      await waitForGrecaptcha();
+      return await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action });
+    } catch (err) {
+      console.warn("reCAPTCHA execution failed:", err);
+      return null;
+    }
+  };
 
   const validate = () => {
     const e = {};
@@ -28,19 +93,34 @@ export default function ContactPage() {
     setLoading(true);
 
     try {
-      // Supabase Edge Function
+      const safeName = sanitizeInput(form.name);
+      const safeEmail = sanitizeInput(form.email, { allowUrls: true });
+      const safeMessage = sanitizeInput(form.message);
+
+      let recaptchaToken = null;
+      if (RECAPTCHA_SITE_KEY) {
+        recaptchaToken = await executeRecaptcha("contact");
+        if (!recaptchaToken) {
+          setErrors({ submit: "reCAPTCHA failed to verify. Please try again." });
+          setLoading(false);
+          return;
+        }
+      }
+
       const endpoint = import.meta.env.VITE_CONTACT_FN_URL || "/api/contact";
 
       const res = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json",
+        headers: {
+          "Content-Type": "application/json",
           "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-         },
+        },
         body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          message: form.message,
-          honey: form.honey,
+          name: safeName,
+          email: safeEmail,
+          message: safeMessage,
+          honey: sanitizeInput(form.honey),
+          recaptchaToken,
         }),
       });
 
@@ -64,10 +144,7 @@ export default function ContactPage() {
   // When sent becomes true, set a 3s redirect timer. Clean up timers on unmount or when closed.
   useEffect(() => {
     if (sent) {
-      // clear any existing
-      if (redirectTimerRef.current) {
-        clearTimeout(redirectTimerRef.current);
-      }
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
       redirectTimerRef.current = setTimeout(() => {
         navigate("/portfolio");
       }, 3000);
@@ -158,7 +235,7 @@ export default function ContactPage() {
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || (RECAPTCHA_SITE_KEY !== "" && !recaptchaReady)}
           className={`group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-blood px-6 py-3 font-semibold text-white ${loading ? "opacity-70 cursor-wait" : ""}`}
         >
           <span className="relative z-10">{loading ? "Sending…" : "Send"}</span>
@@ -168,6 +245,12 @@ export default function ContactPage() {
             className="absolute inset-0 -translate-x-full bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.15),transparent)] transition-transform duration-500 group-hover:translate-x-0"
           />
         </button>
+
+        {RECAPTCHA_SITE_KEY && !recaptchaReady && (
+          <p className="mt-3 text-sm text-neutral-400">
+            Preparing reCAPTCHA verification...
+          </p>
+        )}
       </form>
 
       {/* Success overlay */}
@@ -178,9 +261,6 @@ export default function ContactPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => {
-              // clicking overlay should not cancel the modal redirect; keep modal open
-            }}
           >
             <motion.div
               className="rounded-3xl bg-neutral-950 p-8 text-center shadow-2xl ring-1 ring-white/10"
