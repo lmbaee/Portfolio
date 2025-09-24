@@ -1,6 +1,12 @@
 export default function WorkExperience() {
   const jobs = [
     {
+      role: "Machine Learning Intern",
+      company: "AI LA",
+      period: "Aug 2025 – Present",
+      desc: "TBD",
+    },
+    {
       role: "IT | Cybersecurity & Software Engineer Rising Intern",
       company: "LA-Tech",
       period: "Aug 2025 – Present",
