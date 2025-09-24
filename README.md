@@ -24,7 +24,7 @@
 1. **Clone the Repository**
 
 ```bash
-git clone https://github.com/lmbaee/Jason_C_Portfolio.git
+git clone https://github.com/lmbaee/Portfolio.git
 ```
 
 2. **Install Frontend Dependencies**

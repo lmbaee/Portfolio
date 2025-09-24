@@ -181,7 +181,7 @@ export default function Nav() {
                 <li>
                   <button
                     className="w-full text-left px-4 py-3 text-sm uppercase tracking-widest text-neutral-200 hover:text-white"
-                    onClick={() => handleScrollOrNav("work")}
+                    onClick={() => handleScrollOrNav("projects")}
                   >
                     Projects
                   </button>
